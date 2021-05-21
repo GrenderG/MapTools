@@ -3,30 +3,43 @@
 // Github:  https://github.com/The-Alpha-Project
 
 using System.IO;
+using System.Collections.Generic;
 
 namespace AlphaCoreExtractor.Core
 {
-    //normalized. X, Z, Y. 127 == 1.0, -127 == -1.0.
-    //Same as 3.x format, except values order which is like alpha MCVT : all outer values first, then all inner ones.
+    /// <summary>
+    /// Same as 3.x format, except values order which is like alpha MCVT : all outer values first, then all inner ones.
+    /// </summary>
     public class MCNRSubChunk
     {
-        public MCNREntry[] Entries;
-        private ushort[] pad;
+        /// <summary>
+        /// Normalized values, X, Z, Y. 127 == 1.0, -127 == -1.0.
+        /// </summary>
+        public List<MCNREntry> Entries = new List<MCNREntry>();  // [9 * 9 + 8 * 8] (145);
 
-        /*
-         * TODO: PAD bytes do not match with the comment below, our offset might be off?
-         * About pad: 0.5.3.3368 lists this as padding always 0 112 245  18 0  8 0 0  0 84  245 18 0.
-         * TODO: How do we read this accorind to explanation 'all outer values first, then inner'
-         */
         public MCNRSubChunk(BinaryReader reader)
         {
-            Entries = new MCNREntry[9 * 9 + 8 * 8];
-            for (int i = 0; i < Entries.Length; i++)
-                Entries[i] = MCNREntry.Read(reader);
+            // Interleave vertices (9-8-9-8)
+            using (BinaryReader outerVerticesReader = new BinaryReader(new MemoryStream(reader.ReadBytes(243)))) // 81 * 3bytes
+            using (BinaryReader innerVerticesReader = new BinaryReader(new MemoryStream(reader.ReadBytes(192)))) // 64 * 3bytes
+            {
+                while (outerVerticesReader.BaseStream.Position != outerVerticesReader.BaseStream.Length)
+                {
+                    for (int i = 0; i < 9; i++)
+                        Entries.Add(MCNREntry.Read(outerVerticesReader));
 
-            pad = new ushort[13];
-            for (int i = 0; i < 13; i++)
-                pad[i] = reader.ReadUInt16();
+                    // If we reached the end, skip inner vertices.
+                    if (innerVerticesReader.BaseStream.Position != innerVerticesReader.BaseStream.Length)
+                        for (int j = 0; j < 8; j++)
+                            Entries.Add(MCNREntry.Read(innerVerticesReader));
+                }
+            }
+
+            /*
+            // TODO: PAD bytes do not match with the comment below.
+             * About pad: 0.5.3.3368 lists this as padding always 0 112 245 18 0 8 0 0 0 84 245 18 0.
+            */
+            reader.ReadBytes(13);
         }
     }
 }
