@@ -1,18 +1,10 @@
+**.pdb
+**.exe
+**.dbc
+**.dll
+**.wdt
 
 MapExtractor/.vs/AlphaCoreExtractor/v16/.suo
-*.pdb
-*.exe
-MapExtractor/bin/x64/Debug/AlphaCoreExtractor.exe.config
-MapExtractor/bin/x64/Debug/Config.txt
-*.dbc
-*.dll
-MapExtractor/bin/x64/Debug/MpqLIbLicense.txt
-*.wdt
-MapExtractor/obj/x64/Debug/.NETFramework,Version=v4.7.2.AssemblyAttributes.cs
-MapExtractor/obj/x64/Debug/AlphaCoreExtractor.csproj.CopyComplete
-MapExtractor/obj/x64/Debug/AlphaCoreExtractor.csproj.CoreCompileInputs.cache
-MapExtractor/obj/x64/Debug/AlphaCoreExtractor.csproj.FileListAbsolute.txt
-MapExtractor/obj/x64/Debug/AlphaCoreExtractor.csprojAssemblyReference.cache
-MapExtractor/obj/x64/Debug/DesignTimeResolveAssemblyReferencesInput.cache
-MapExtractor/packages/SharpZipLib.0.86.0/.signature.p7s
-MapExtractor/packages/SharpZipLib.0.86.0/SharpZipLib.0.86.0.nupkg
+MapExtractor/bin
+MapExtractor/obj
+MapExtractor/packages
