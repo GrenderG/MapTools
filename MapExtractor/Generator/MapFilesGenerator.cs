@@ -8,6 +8,8 @@ using System.Text;
 using AlphaCoreExtractor.Log;
 using AlphaCoreExtractor.Core;
 using AlphaCoreExtractor.Helpers;
+using AlphaCoreExtractor.DBC.Structures;
+using AlphaCoreExtractor.DBC;
 
 namespace AlphaCoreExtractor.Generator
 {
@@ -19,6 +21,8 @@ namespace AlphaCoreExtractor.Generator
             {
                 Logger.Notice($"Generating .map files for Map {map.DBCMap.MapName_enUS}");
                 var fileCount = 0;
+
+                // HeightMap
                 for (int tileBlockX = 0; tileBlockX < Constants.TileBlockSize; tileBlockX++)
                 {
                     for (int tileBlockY = 0; tileBlockY < Constants.TileBlockSize; tileBlockY++)
@@ -39,13 +43,72 @@ namespace AlphaCoreExtractor.Generator
                             using (FileStream fs = new FileStream(outputFileName, FileMode.Create))
                             {
                                 fs.Write(Encoding.ASCII.GetBytes(Globals.MapVersion), 0, 10);
-                                using (BinaryWriter br = new BinaryWriter(fs))
+                                using (BinaryWriter bw = new BinaryWriter(fs))
                                     for (int cy = 0; cy < 256; cy++)
                                         for (int cx = 0; cx < 256; cx++)
-                                            br.Write(CalculateZ(cell, (double)cy, (double)cx));
+                                            bw.Write(CalculateZ(cell, (double)cy, (double)cx));
                             }
 
                             fileCount++;
+                        }
+                    }
+                }
+
+                // AreaInformation (AreaNumber 0.5.3, Flags 1.12, AreaLevel 1.12, ExploreBit Custom, FactionGroup mask 1.12)
+                for (int tileBlockX = 0; tileBlockX < Constants.TileBlockSize; tileBlockX++)
+                {
+                    for (int tileBlockY = 0; tileBlockY < Constants.TileBlockSize; tileBlockY++)
+                    {
+                        var tileBlock = map.TileBlocks[tileBlockX, tileBlockY];
+                        if (tileBlock != null)
+                        {
+                            var mapID = map.DBCMap.ID.ToString("000");
+                            var blockX = tileBlockX.ToString("00");
+                            var blockY = tileBlockY.ToString("00");
+                            var outputFileName = $@"{Paths.OutputMapsPath}{mapID}{blockX}{blockY}.map";
+
+                            using (FileStream fs = new FileStream(outputFileName, FileMode.Append))
+                            {
+                                using (BinaryWriter bw = new BinaryWriter(fs))
+                                {                                 
+                                    for (int i = 0; i < Constants.TileSize; i++)
+                                    {
+                                        for (int j = 0; j < Constants.TileSize; j++)
+                                        {
+                                            var cell = tileBlock.Tiles[i, j];
+                                            var areaNumber = cell.areaNumber;
+
+                                            if(areaNumber > 4000000000)
+                                            {
+                                                bw.Write((uint)0xFF);
+                                                bw.Write((byte)0xFF);
+                                                bw.Write((byte)0xFF);
+                                                bw.Write((ushort)0xFF);
+                                                bw.Write((byte)0xFF);
+                                                continue;
+                                            }
+
+                                            if (DBCStorage.TryGetAreaByAreaNumber(areaNumber, out AreaTable areaTable))
+                                            {
+                                                bw.Write((uint)areaTable.AreaNumber);
+                                                bw.Write((byte)areaTable.Area_Flags);
+                                                bw.Write((byte)areaTable.Area_Level);
+                                                bw.Write((ushort)areaTable.Exploration_Bit);
+                                                bw.Write((byte)areaTable.FactionGroupMask);
+                                            }
+                                            else
+                                            {
+                                                Logger.Warning($"Unable to locate AreaNumber {areaNumber}");
+                                                bw.Write((uint)0xFF);
+                                                bw.Write((byte)0xFF);
+                                                bw.Write((byte)0xFF);
+                                                bw.Write((ushort)0xFF);
+                                                bw.Write((byte)0xFF);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -87,7 +150,6 @@ namespace AlphaCoreExtractor.Generator
 
         private static float CalculateZ(Cell cell, double cy, double cx)
         {
-            // Calculates x from cy, maybe has to do with coordinate system.
             var x = (cy * Constants.TileSizeYrds) / ((double)256 - 1);
             var y = (cx * Constants.TileSizeYrds) / ((double)256 - 1);
             return Convert.ToSingle(GetZ(cell, x, y));

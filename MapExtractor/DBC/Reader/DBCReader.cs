@@ -68,8 +68,7 @@ namespace AlphaCoreExtractor.DBC.Reader
 
             try
             {
-                var filePath = Paths.Combine(Paths.DBCLoadPath, dbcFile);
-                using (var dbReader = new BinaryReader(new MemoryStream(File.ReadAllBytes(filePath))))
+                using (var dbReader = new BinaryReader(new MemoryStream(File.ReadAllBytes(dbcFile))))
                 {
                     DBCHeader header = ExtractHeader(dbReader);
 

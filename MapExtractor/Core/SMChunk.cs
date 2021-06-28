@@ -27,7 +27,7 @@ namespace AlphaCoreExtractor.Core
         public uint sizeAlpha;
         public uint offsShadow;
         public uint sizeShadow;
-        public uint area;
+        public uint areaNumber;
         public uint nMapObjRefs;
         public ushort holes_low_res;
         public ushort padding;
@@ -63,7 +63,7 @@ namespace AlphaCoreExtractor.Core
             sizeAlpha = reader.ReadUInt32();
             offsShadow = reader.ReadUInt32(); // MCSH
             sizeShadow = reader.ReadUInt32();
-            area = reader.ReadUInt32(); // in alpha: zone id (4) sub zone id (4)
+            areaNumber = reader.ReadUInt32(); // in alpha: zone id (4) sub zone id (4)
             nMapObjRefs = reader.ReadUInt32();
             holes_low_res = reader.ReadUInt16();
             padding = reader.ReadUInt16();

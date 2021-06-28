@@ -234,11 +234,11 @@ namespace AlphaCoreExtractor.Core
             {
                 for (int y = 0; y < Constants.TileSize; y++)
                 {
-                    var areaID = Tiles[x, y].area;
+                    var areaID = Tiles[x, y].areaNumber;
                     if (!areas.Contains(areaID))
                     {
                         if (DBCStorage.TryGetAreaByAreaNumber(areaID, out AreaTable areaTable))
-                            yield return areaTable.AreaName_enUS;
+                            yield return areaTable.Name;
                         else
                             yield return $"Unknown area {areaID}";
                         areas.Add(areaID);

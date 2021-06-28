@@ -112,6 +112,8 @@
     <Compile Include="DBC\Reader\DBCHeader.cs" />
     <Compile Include="DBC\Reader\DBCReader.cs" />
     <Compile Include="DBC\Structures\AreaTable.cs" />
+    <Compile Include="DBC\Structures\AreaTable_Alpha.cs" />
+    <Compile Include="DBC\Structures\AreaTable_Vanilla.cs" />
     <Compile Include="DBC\Structures\DBCMap.cs" />
     <Compile Include="Generator\MapFilesGenerator.cs" />
     <Compile Include="Helpers\Constants.cs" />
@@ -149,6 +151,9 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <None Include="vanilla.alc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="AlphaCoreLogo.ico" />
