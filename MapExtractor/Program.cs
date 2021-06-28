@@ -3,96 +3,109 @@
 // Github:  https://github.com/The-Alpha-Project
 
 using System;
+using System.IO;
+using System.Threading;
 using System.Reflection;
 using System.Collections.Generic;
 
 using AlphaCoreExtractor.MPQ;
 using AlphaCoreExtractor.DBC;
+using AlphaCoreExtractor.Log;
 using AlphaCoreExtractor.Core;
 using AlphaCoreExtractor.Helpers;
+using AlphaCoreExtractor.Generator;
+using AlphaCoreExtractor.DBC.Structures;
 
 namespace AlphaCoreExtractor
 {
     class Program
     {
-        public static List<CMapObj> LoadedMaps = new List<CMapObj>();
+        public static List<DBCMap> LoadedMaps = new List<DBCMap>();
         private static Version Version;
         private static Queue<char> Loading = new Queue<char>();
+        private static Thread MapsThread;
+        private static volatile bool IsRunning = false;
 
         static void Main(string[] args)
+        {
+            IsRunning = true;
+            MapsThread = new Thread(new ThreadStart(StartProcess));
+            MapsThread.Name = "MapsThread";
+            MapsThread.Start();
+
+            while (IsRunning)
+            {
+                Thread.Sleep(1000);
+                UpdateLoadingStatus();
+            }
+
+            MapsThread.Join(2000);
+            MapsThread.Interrupt();
+            Console.ReadLine();
+            SetDefaultTitle();
+        }
+
+        private static void StartProcess()
         {
             Version = Assembly.GetExecutingAssembly().GetName().Version;
             SetDefaultTitle();
             PrintHeader();
 
-            if (!DBCExtractor.ExtractDBC())
+            try
             {
-                Console.WriteLine("Unable to extract DBC files, exiting...");
-                Console.ReadLine();
-                Environment.Exit(0);
-            }
-
-            if (!DBCStorage.Initialize())
-            {
-                Console.WriteLine("Unable to initialize DBC Storage, exiting...");
-                Console.ReadLine();
-                Environment.Exit(0);
-            }
-
-            List<string> WDTFiles;
-            if (!WDTExtractor.ExtractWDTFiles(out WDTFiles))
-            {
-                Console.WriteLine("Unable to extract WDT files, exiting...");
-                Console.ReadLine();
-                Environment.Exit(0);
-            }
-
-            // For test only, extract only Azeroth.
-            // TODO: We need to process, build map files, and release memory ASAP.
-            // Right now, loading all data we are parsing would result in around 10gb.
-
-            //Begin loading all wdt information.
-            if (!Globals.LoadAsync)
-            {
-                foreach (var wdt in WDTFiles)
+                // Extract Map.dbc and AreaTable.dbc
+                if (!DBCExtractor.ExtractDBC())
                 {
-                    var map = new CMapObj(wdt, null);
-                    map.LoadData();
-                    LoadedMaps.Add(map);
-                    break;
+                    Logger.Error("Unable to extract DBC files, exiting...");
+                    Console.ReadLine();
+                    Environment.Exit(0);
                 }
-            }
-            else
-            {
-                foreach (var wdt in WDTFiles)
+
+                // Load both files in memory.
+                if (!DBCStorage.Initialize())
                 {
-                    AsyncMapLoader loadMapTask = new AsyncMapLoader(wdt);
-                    loadMapTask.OnMapLoaded += OnMapLoaded;
-                    loadMapTask.RunWorkerAsync();
-                    break;
+                    Logger.Error("Unable to initialize DBC Storage, exiting...");
+                    Console.ReadLine();
+                    Environment.Exit(0);
                 }
+
+                // Extract available maps inside MPQ
+                Dictionary<DBCMap, string> WDTFiles;
+                if (!WDTExtractor.ExtractWDTFiles(out WDTFiles))
+                {
+                    Logger.Error("Unable to extract WDT files, exiting...");
+                    Console.ReadLine();
+                    Environment.Exit(0);
+                }
+
+                // Flush .map files output dir.
+                Directory.Delete(Paths.OutputMapsPath, true);
+
+                //Begin parsing adt files and generate .map files.
+                foreach (var entry in WDTFiles)
+                {
+                    using (CMapObj map = new CMapObj(entry.Key, entry.Value)) // Key:DbcMap Value:FilePath
+                    {
+                        MapFilesGenerator.GenerateMapFiles(map);
+                        LoadedMaps.Add(entry.Key);
+                    }
+
+                    GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true);
+                }
+
+                WDTFiles?.Clear();
+                Console.WriteLine();
+                Logger.Success("Process Complete, press any key to exit...");
             }
-
-            Console.ReadLine();
-        }
-
-        /// <summary>
-        /// Map finished loading, clean up and add it to our LoadedMaps collection.
-        /// </summary>
-        private static void OnMapLoaded(object sender, AsyncMapLoaderEventArgs e)
-        {
-            if (sender is AsyncMapLoader loader)
+            catch (Exception ex)
             {
-                loader.OnMapLoaded -= OnMapLoaded;
-                loader.Dispose();
+                Logger.Error(ex.Message);
+                Logger.Error(ex.StackTrace);
             }
-
-            if (e.Map != null)
-                LoadedMaps.Add(e.Map);
-
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized);
-
-            SetDefaultTitle();
+            finally
+            {
+                IsRunning = false;
+            }
         }
 
         #region crap
@@ -109,26 +122,22 @@ namespace AlphaCoreExtractor
             Console.WriteLine();
         }
 
-        private static DateTime LastReport = DateTime.UtcNow;
-        private static object _lock = new object();
         /// <summary>
         /// We dont report real progress, eventually, we could estimate.
         /// </summary>
-        public static void UpdateLoadingStatus()
+        private static void UpdateLoadingStatus()
         {
-            lock (_lock)
+            if (IsRunning)
             {
-                var now = DateTime.UtcNow;
-                if (now.Subtract(LastReport).Milliseconds > 300)
-                {
-                    Loading.Enqueue('.');
-                    Console.Title = $"AlphaCore Map Extractor {Version}  |  Loading, please wait {string.Join("", Loading.ToArray())}";
+                Loading.Enqueue('.');
+                Console.Title = $"AlphaCore Map Extractor {Version}  |  Working, please wait {string.Join("", Loading.ToArray())}";
 
-                    if (Loading.Count > 5)
-                        Loading.Clear();
-
-                    LastReport = now; // + elapsed? I dont care.
-                }
+                if (Loading.Count > 5)
+                    Loading.Clear();
+            }
+            else
+            {
+                SetDefaultTitle();
             }
         }
         #endregion

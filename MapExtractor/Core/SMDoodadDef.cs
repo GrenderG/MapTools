@@ -2,8 +2,8 @@
 // Discord: https://discord.gg/RzBMAKU
 // Github:  https://github.com/The-Alpha-Project
 
-using System;
 using System.IO;
+using AlphaCoreExtractor.Log;
 using System.Collections.Generic;
 using AlphaCoreExtractor.Helpers;
 
@@ -37,7 +37,7 @@ namespace AlphaCoreExtractor.Core
                     doodadDefs.Add(new SMDoodadDef(reader));
 
             if (Globals.Verbose)
-                Console.WriteLine($"Loaded {doodadDefs.Count} SMDoodadDefs");
+                Logger.Info($"Loaded {doodadDefs.Count} SMDoodadDefs");
 
             return doodadDefs.ToArray();
         }

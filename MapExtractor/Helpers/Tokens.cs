@@ -22,5 +22,7 @@ namespace AlphaCoreExtractor.Helpers
         public static uint MCNK = 1296256587; // The header is 128 bytes like later versions, but information inside is placed slightly differently. Offsets are relative to the end of MCNK header.
         public static uint MDNM = 1296322125; // Filenames Doodads. Zero-terminated strings with complete paths to models.
         public static uint MONM = 1297043021; // Filenames WMOS. Zero-terminated strings with complete paths to models.
+        public static uint MCLY = 1296256089; // Texture layer definitions for this map chunk. 16 bytes per layer, up to 4 layers (thus, layer count = size / 16).
+        public static uint MCRF = 1296257606; // A list of with MCNK.nDoodadRefs + MCNK.nMapObjRefs indices into the file's MDDF and MODF chunks, saying which MCNK subchunk those particular doodads and objects are drawn within. This MCRF list contains duplicates for map doodads that overlap areas.
     }
 }

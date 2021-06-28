@@ -6,21 +6,13 @@ using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using AlphaCoreExtractor.Log;
+using AlphaCoreExtractor.Helpers;
 
 namespace AlphaCoreExtractor.DBC.Reader
 {
     public static class DBCReader
     {
-        private static string AssemblyDirectory
-        {
-            get
-            {
-                string codeBase = Assembly.GetExecutingAssembly().CodeBase;
-                string path = Uri.UnescapeDataString(new UriBuilder(codeBase).Path);
-                return Path.GetDirectoryName(path);
-            }
-        }
-
         private static DBCHeader ExtractHeader(BinaryReader dbReader)
         {
             return new DBCHeader
@@ -39,7 +31,8 @@ namespace AlphaCoreExtractor.DBC.Reader
 
             try
             {
-                using (var dbReader = new BinaryReader(new MemoryStream(File.ReadAllBytes(AssemblyDirectory + "/dbc/" + dbcFile))))
+                var filePath = Paths.Combine(Paths.DBCLoadPath, dbcFile);
+                using (var dbReader = new BinaryReader(new MemoryStream(File.ReadAllBytes(filePath))))
                 {
                     DBCHeader header = ExtractHeader(dbReader);
 
@@ -63,7 +56,7 @@ namespace AlphaCoreExtractor.DBC.Reader
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error while loading {dbcFile}: {ex.Message}");
+                Logger.Error($"Error while loading {dbcFile}: {ex.Message}");
             }
 
             return tempList;
@@ -75,7 +68,8 @@ namespace AlphaCoreExtractor.DBC.Reader
 
             try
             {
-                using (var dbReader = new BinaryReader(new MemoryStream(File.ReadAllBytes(AssemblyDirectory + "/dbc/" + dbcFile))))
+                var filePath = Paths.Combine(Paths.DBCLoadPath, dbcFile);
+                using (var dbReader = new BinaryReader(new MemoryStream(File.ReadAllBytes(filePath))))
                 {
                     DBCHeader header = ExtractHeader(dbReader);
 
@@ -100,7 +94,7 @@ namespace AlphaCoreExtractor.DBC.Reader
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error while loading {dbcFile}: {ex.Message}");
+                Logger.Error($"Error while loading {dbcFile}: {ex.Message}");
             }
 
             return tempList;

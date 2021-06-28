@@ -2,8 +2,8 @@
 // Discord: https://discord.gg/RzBMAKU
 // Github:  https://github.com/The-Alpha-Project
 
-using System;
 using System.IO;
+using AlphaCoreExtractor.Log;
 using System.Collections.Generic;
 using AlphaCoreExtractor.Helpers;
 
@@ -43,7 +43,7 @@ namespace AlphaCoreExtractor.Core
                     mapDefs.Add(new SMMapObjDef(reader));
 
             if (Globals.Verbose)
-                Console.WriteLine($"Loaded {mapDefs.Count} SMMapObjDefs");
+                Logger.Info($"Loaded {mapDefs.Count} SMMapObjDefs");
 
             return mapDefs.ToArray();
         }

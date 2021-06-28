@@ -26,6 +26,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+using AlphaCoreExtractor.Helpers;
 using System;
 using System.IO;
 
@@ -65,7 +66,7 @@ namespace MpqLib
             }
             set
             {
-                _filename = value;
+                _filename = Paths.Transform(value);
                 EncryptionSeed = CalculateEncryptionSeed();
             }
         }

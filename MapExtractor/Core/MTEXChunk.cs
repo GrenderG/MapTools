@@ -2,8 +2,8 @@
 // Discord: https://discord.gg/RzBMAKU
 // Github:  https://github.com/The-Alpha-Project
 
-using System;
 using System.IO;
+using AlphaCoreExtractor.Log;
 using System.Collections.Generic;
 using AlphaCoreExtractor.Helpers;
 
@@ -22,8 +22,8 @@ namespace AlphaCoreExtractor.Core
                 while (reader.BaseStream.Position != chunk.Length)
                     mtex.Filenames.Add(reader.ReadCString());
 
-                if(Globals.Verbose)
-                    Console.WriteLine($"Loaded {mtex.Filenames.Count} MTEXChunks");
+                if (Globals.Verbose)
+                    Logger.Info($"Loaded {mtex.Filenames.Count} MTEXChunks");
             }
 
             return mtex;

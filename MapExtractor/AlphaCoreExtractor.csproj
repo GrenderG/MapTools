@@ -86,29 +86,44 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\BinaryReaderProgress.cs" />
+    <Compile Include="Core\BitReader.cs" />
     <Compile Include="Core\C3MCNRVector.cs" />
     <Compile Include="Core\C3Vector.cs" />
     <Compile Include="Core\C4Vector.cs" />
     <Compile Include="Core\CAaBox.cs" />
     <Compile Include="Core\CAaSphere.cs" />
+    <Compile Include="Core\Cell.cs" />
     <Compile Include="Core\CImVector.cs" />
     <Compile Include="Core\CMapArea.cs" />
     <Compile Include="Core\CMapObj.cs" />
+    <Compile Include="Core\CRange.cs" />
+    <Compile Include="Core\MCSESubChunk.cs" />
+    <Compile Include="Core\MCLQSubChunk.cs" />
+    <Compile Include="Core\MCSHSubChunk.cs" />
+    <Compile Include="Core\SLTiles.cs" />
+    <Compile Include="Core\SLVert.cs" />
+    <Compile Include="Core\SMVert.cs" />
+    <Compile Include="Core\SOVert.cs" />
+    <Compile Include="Core\SWFlowv.cs" />
+    <Compile Include="Core\SWVert.cs" />
+    <Compile Include="Core\Vector.cs" />
     <Compile Include="DBC\DBCStorage.cs" />
     <Compile Include="DBC\Reader\BinaryReaderExtensions.cs" />
     <Compile Include="DBC\Reader\DBCHeader.cs" />
     <Compile Include="DBC\Reader\DBCReader.cs" />
     <Compile Include="DBC\Structures\AreaTable.cs" />
+    <Compile Include="DBC\Structures\DBCMap.cs" />
+    <Compile Include="Generator\MapFilesGenerator.cs" />
+    <Compile Include="Helpers\Constants.cs" />
+    <Compile Include="Helpers\Enums.cs" />
     <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Core\DataChunkHeader.cs" />
     <Compile Include="Helpers\Globals.cs" />
     <Compile Include="Core\MCNREntry.cs" />
-    <Compile Include="Core\MCVT SubChunk.cs" />
+    <Compile Include="Core\MCVTSubChunk.cs" />
     <Compile Include="Core\MTEXChunk.cs" />
-    <Compile Include="Helpers\AsyncMapLoader.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Helpers\AsyncMapLoaderEventArgs.cs" />
+    <Compile Include="Helpers\Paths.cs" />
+    <Compile Include="Log\Logger.cs" />
     <Compile Include="MPQ\DBCExtractor.cs" />
     <Compile Include="MPQ\MpqLib\BitStream.cs" />
     <Compile Include="MPQ\MpqLib\MpqArchive.cs" />
@@ -129,7 +144,7 @@
     <Compile Include="Core\SMMapObjDef.cs" />
     <Compile Include="Core\MCNRSubChunk.cs" />
     <Compile Include="Core\SMOHeader.cs" />
-    <Compile Include="Helpers\Tokenss.cs" />
+    <Compile Include="Helpers\Tokens.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

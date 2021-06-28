@@ -11,6 +11,7 @@ namespace AlphaCoreExtractor.Core
         public float x;
         public float y;
         public float z;
+
         public C3Vector(BinaryReader reader)
         {
             z = reader.ReadSingle();

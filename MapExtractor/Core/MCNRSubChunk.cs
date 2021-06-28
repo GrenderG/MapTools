@@ -39,7 +39,7 @@ namespace AlphaCoreExtractor.Core
             // TODO: PAD bytes do not match with the comment below.
              * About pad: 0.5.3.3368 lists this as padding always 0 112 245 18 0 8 0 0 0 84 245 18 0.
             */
-            reader.ReadBytes(13);
+            var pad = reader.ReadBytes(13);
         }
     }
 }
