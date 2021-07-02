@@ -23,7 +23,7 @@ namespace AlphaCoreExtractor.DBC.Structures
         public AreaTable(AreaTable_Alpha areaTableAlpha, AreaTable_Vanilla areaTableVanilla, uint explore_bit)
         {
             if (areaTableAlpha.ID != areaTableVanilla.ID)
-                throw new Exception("Invalid area ID's.");
+                throw new Exception("Invalid area IDs.");
 
             this.ID = areaTableAlpha.ID;
 
